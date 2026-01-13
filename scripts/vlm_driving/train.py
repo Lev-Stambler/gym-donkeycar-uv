@@ -97,12 +97,12 @@ def apply_lora(model, cfg: DictConfig):
     logger.info("Applying LoRA adapters")
 
     lora_config = LoraConfig(
-        r=cfg.model.lora.r,
-        lora_alpha=cfg.model.lora.lora_alpha,
-        target_modules=list(cfg.model.lora.target_modules),
-        lora_dropout=cfg.model.lora.lora_dropout,
-        bias=cfg.model.lora.bias,
-        task_type=cfg.model.lora.task_type,
+        r=cfg.lora.r,
+        lora_alpha=cfg.lora.lora_alpha,
+        target_modules=list(cfg.lora.target_modules),
+        lora_dropout=cfg.lora.lora_dropout,
+        bias=cfg.lora.bias,
+        task_type=cfg.lora.task_type,
     )
 
     model = get_peft_model(model, lora_config)

@@ -51,6 +51,7 @@ docs = [
 ]
 vlm = [
     "torch>=2.0",
+    "torchvision",
     "transformers>=4.45.0",
     "accelerate>=0.25.0",
     "peft>=0.7.0",
