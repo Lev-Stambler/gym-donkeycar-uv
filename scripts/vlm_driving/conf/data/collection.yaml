@@ -1,0 +1,45 @@
+# Data collection configuration
+collection:
+  # Output directory for raw data
+  output_dir: ${data_dir}/raw
+
+  # Track/environment to use
+  track: "donkey-generated-roads-v0"
+
+  # Collection mode: autopilot, manual, or mixed
+  mode: autopilot
+
+  # Number of frames to collect
+  num_frames: 10000
+
+  # Frame rate (frames per second)
+  target_fps: 20
+
+  # Camera resolution (height, width, channels)
+  cam_resolution: [120, 160, 3]
+
+# Autopilot settings (CTE-based proportional controller)
+autopilot:
+  kp: 0.8  # Proportional gain for steering
+  base_throttle: 0.3
+  max_throttle: 0.5
+
+# Preprocessing settings
+preprocessing:
+  # Filter criteria
+  max_cte: 5.0  # Max cross-track error before filtering out
+  min_speed: 0.5  # Min speed to include frame
+
+  # Steering buckets
+  num_steering_buckets: 7  # 5 or 7
+
+  # Dataset split
+  val_split: 0.1
+  test_split: 0.0
+
+  # Balance dataset by undersampling majority class
+  balance_classes: false
+
+# Processed data paths
+train_file: ${data_dir}/processed/train.jsonl
+val_file: ${data_dir}/processed/val.jsonl

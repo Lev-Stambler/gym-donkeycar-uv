@@ -1,0 +1,21 @@
+# Main Hydra configuration for VLM Driving Pipeline
+defaults:
+  - data: collection
+  - model: qwen3_2b
+  - model: lora
+  - training: default
+  - inference: default
+  - _self_
+
+# Global settings
+seed: 42
+output_dir: outputs/${now:%Y-%m-%d}/${now:%H-%M-%S}
+
+# Simulator connection
+simulator:
+  host: "127.0.0.1"
+  port: 9091
+  exe_path: null  # Path to simulator executable (optional)
+
+# Data paths
+data_dir: data

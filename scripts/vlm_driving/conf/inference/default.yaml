@@ -1,0 +1,24 @@
+# Inference configuration
+inference:
+  # Model checkpoint path
+  checkpoint: null  # Set via CLI: model.checkpoint=outputs/final_model
+
+  # Merge LoRA adapter into base model for faster inference
+  merge_adapter: true
+
+  # Driving parameters
+  throttle: 0.3
+
+  # Smoothing (moving average over last N predictions)
+  smoothing_window: 1  # 1 = no smoothing
+
+  # Evaluation settings
+  num_episodes: 5
+  max_steps_per_episode: 1000
+
+  # Metrics to track
+  track_metrics:
+    - "lap_time"
+    - "cte_mean"
+    - "cte_max"
+    - "num_collisions"
