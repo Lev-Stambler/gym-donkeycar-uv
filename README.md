@@ -1,11 +1,11 @@
-# OpenAI Gym Environments for Donkey Car
+# OpenAI Gym Environments for Donkey Car (uv fork)
 
-[![pypi](https://img.shields.io/pypi/v/gym-donkeycar.svg)](https://pypi.python.org/pypi/gym-donkeycar) [![CI](https://github.com/tawnkramer/gym-donkeycar/workflows/CI/badge.svg)](https://github.com/tawnkramer/gym-donkeycar/actions) [![Documentation Status](https://readthedocs.org/projects/gym-donkeycar/badge/?version=latest)](https://gym-donkeycar.readthedocs.io/en/latest/?badge=latest)
+> Fork of [tawnkramer/gym-donkeycar](https://github.com/tawnkramer/gym-donkeycar) with uv-based dependency management.
 
 Donkey Car OpenAI Gym
 
   - Free software: MIT license
-  - Documentation: <https://gym-donkeycar.readthedocs.io/en/latest/>
+  - Original documentation: <https://gym-donkeycar.readthedocs.io/en/latest/>
 
 ## Installation
 
@@ -14,13 +14,13 @@ Download simulator binaries: https://github.com/tawnkramer/gym-donkeycar/release
 Install using uv (recommended):
 
 ```shell
-uv add git+https://github.com/tawnkramer/gym-donkeycar
+uv add git+https://github.com/Lev-Stambler/gym-donkeycar-uv
 ```
 
 Or with pip:
 
 ```shell
-pip install git+https://github.com/tawnkramer/gym-donkeycar
+pip install git+https://github.com/Lev-Stambler/gym-donkeycar-uv
 ```
 
 ### Development Setup
@@ -28,8 +28,8 @@ pip install git+https://github.com/tawnkramer/gym-donkeycar
 Clone the repository and install with uv:
 
 ```shell
-git clone https://github.com/tawnkramer/gym-donkeycar
-cd gym-donkeycar
+git clone https://github.com/Lev-Stambler/gym-donkeycar-uv
+cd gym-donkeycar-uv
 uv sync --extra tests --extra docs
 ```
 
@@ -90,7 +90,7 @@ except KeyboardInterrupt:
 env.close()
 ```
 
-- see more examples: https://github.com/tawnkramer/gym-donkeycar/tree/master/examples
+- see more examples: https://github.com/Lev-Stambler/gym-donkeycar-uv/tree/master/examples
 
 ## Action space
 

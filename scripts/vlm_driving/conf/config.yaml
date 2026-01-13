@@ -2,7 +2,6 @@
 defaults:
   - data: collection
   - model: qwen3_2b
-  - model: lora
   - training: default
   - inference: default
   - _self_
