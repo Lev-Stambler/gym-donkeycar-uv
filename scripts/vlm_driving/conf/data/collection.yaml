@@ -3,11 +3,11 @@ collection:
   # Output directory for raw data
   output_dir: ${data_dir}/raw
 
-  # Track/environment to use
-  track: "donkey-generated-roads-v0"
+  # Track/environment to use (warehouse for obstacle avoidance)
+  track: "donkey-warehouse-v0"
 
-  # Collection mode: autopilot, manual, or mixed
-  mode: autopilot
+  # Collection mode: autopilot, obstacle_aware, or mixed
+  mode: obstacle_aware
 
   # Number of frames to collect
   num_frames: 10000
@@ -18,17 +18,26 @@ collection:
   # Camera resolution (height, width, channels)
   cam_resolution: [120, 160, 3]
 
-# Autopilot settings (CTE-based proportional controller)
+# Autopilot settings (for normal driving phases)
 autopilot:
   kp: 0.8  # Proportional gain for steering
-  base_throttle: 0.3
-  max_throttle: 0.5
+  base_throttle: 0.5  # Higher throttle for obstacle avoidance task
+  max_throttle: 0.7
+
+# Obstacle avoidance settings
+obstacle:
+  # Number of frames to lookback when collision occurs
+  lookback_frames: 5
+  # Throttle during turn execution
+  turn_throttle: 0.2
+  # Steps to execute for 80-degree turn (calibrate empirically)
+  turn_steps: 100
 
 # Preprocessing settings
 preprocessing:
   # Filter criteria
-  max_cte: 5.0  # Max cross-track error before filtering out
-  min_speed: 0.5  # Min speed to include frame
+  max_cte: 10.0  # Higher threshold for warehouse (no track lines)
+  min_speed: 0.3  # Lower threshold to capture slow maneuvers
 
   # Steering buckets
   num_steering_buckets: 7  # 5 or 7

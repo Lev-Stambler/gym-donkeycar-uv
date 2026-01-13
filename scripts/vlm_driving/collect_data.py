@@ -3,18 +3,25 @@
 Data collection script for VLM driving training.
 
 Collects images and steering/throttle data from the Donkey Car simulator
-using either autopilot (CTE-based controller) or manual input.
+using either autopilot (CTE-based controller) or obstacle-aware mode.
+
+Obstacle-aware mode:
+- Drives forward until collision detected
+- Labels recent frames with turn direction (A or G)
+- Executes turn to recover
+- Repeats
 
 Usage:
     uv run python scripts/vlm_driving/collect_data.py
     uv run python scripts/vlm_driving/collect_data.py collection.track=donkey-warehouse-v0
-    uv run python scripts/vlm_driving/collect_data.py collection.mode=manual collection.num_frames=5000
+    uv run python scripts/vlm_driving/collect_data.py collection.mode=obstacle_aware
 """
 
 import json
 import logging
 import sys
 import time
+from collections import deque
 from datetime import datetime
 from pathlib import Path
 
@@ -28,6 +35,8 @@ from omegaconf import DictConfig, OmegaConf
 from PIL import Image
 
 import gym_donkeycar  # noqa: F401 - registers environments
+from utils.image_analysis import analyze_open_space
+from utils.steering_buckets import steering_to_token
 
 logger = logging.getLogger(__name__)
 
@@ -66,21 +75,29 @@ def save_frame(
     info: dict,
     output_dir: Path,
     track_name: str,
+    steering_token: str = None,
+    is_obstacle_frame: bool = False,
 ) -> None:
     """Save a single frame's image and metadata."""
     # Save image
     img_path = output_dir / f"{frame_num:06d}.jpg"
     Image.fromarray(image).save(img_path, quality=95)
 
+    # Compute steering token if not provided
+    if steering_token is None:
+        steering_token = steering_to_token(steering, num_buckets=7)
+
     # Save metadata
     metadata = {
         "frame": frame_num,
         "steering": float(steering),
+        "steering_token": steering_token,
         "throttle": float(throttle),
         "cte": float(info.get("cte", 0.0)),
         "speed": float(info.get("speed", 0.0)),
         "pos": list(info.get("pos", (0, 0, 0))),
         "hit": str(info.get("hit", "none")),
+        "is_obstacle_frame": is_obstacle_frame,
         "track": track_name,
         "timestamp": datetime.now().isoformat(),
     }
@@ -108,17 +125,13 @@ def collect_autopilot(env, cfg: DictConfig, output_dir: Path, track_name: str) -
         # Reset environment
         obs = env.reset()
         done = False
+        last_info = {"cte": 0.0}
 
         while not done and frame_num < target_frames:
             start_time = time.time()
 
             # Get autopilot action
-            # Need to do a step first to get info
-            if frame_num == 0:
-                # First frame, use zero steering
-                action = np.array([0.0, cfg.autopilot.base_throttle], dtype=np.float32)
-            else:
-                action = autopilot_action(last_info, cfg)
+            action = autopilot_action(last_info, cfg)
 
             # Execute action
             obs, reward, done, info = env.step(action)
@@ -149,6 +162,153 @@ def collect_autopilot(env, cfg: DictConfig, output_dir: Path, track_name: str) -
             elapsed = time.time() - start_time
             if elapsed < frame_interval:
                 time.sleep(frame_interval - elapsed)
+
+    return frame_num
+
+
+def collect_obstacle_aware(
+    env, cfg: DictConfig, output_dir: Path, track_name: str
+) -> int:
+    """
+    Collect data with obstacle awareness.
+
+    Drives forward until collision, then:
+    1. Labels recent frames with turn direction
+    2. Executes turn to recover
+    3. Continues driving
+
+    Returns:
+        Number of frames collected
+    """
+    frame_num = 0
+    target_frames = cfg.collection.num_frames
+    target_fps = cfg.collection.target_fps
+    frame_interval = 1.0 / target_fps
+
+    # Lookback buffer for obstacle frames
+    lookback_frames = cfg.obstacle.lookback_frames
+    frame_buffer = deque(maxlen=lookback_frames)
+
+    # Turn configuration
+    turn_steps = cfg.obstacle.turn_steps
+    turn_throttle = cfg.obstacle.turn_throttle
+
+    collision_count = 0
+    normal_frame_count = 0
+    obstacle_frame_count = 0
+
+    logger.info(f"Collecting {target_frames} frames with obstacle awareness...")
+    logger.info(f"Lookback buffer: {lookback_frames} frames")
+    logger.info(f"Turn steps: {turn_steps}")
+
+    while frame_num < target_frames:
+        # Reset environment
+        obs = env.reset()
+        done = False
+        time.sleep(0.5)  # Wait for reset
+
+        while not done and frame_num < target_frames:
+            start_time = time.time()
+
+            # Drive forward with moderate throttle
+            action = np.array([0.0, cfg.autopilot.base_throttle], dtype=np.float32)
+
+            # Execute action
+            obs, reward, done, info = env.step(action)
+
+            # Store frame in lookback buffer
+            frame_buffer.append(
+                {
+                    "image": obs.copy(),
+                    "steering": float(action[0]),
+                    "throttle": float(action[1]),
+                    "info": info.copy(),
+                }
+            )
+
+            # Check for collision
+            hit = info.get("hit", "none")
+            if hit != "none":
+                collision_count += 1
+                logger.info(f"Collision #{collision_count} detected: {hit}")
+
+                # Analyze image to determine turn direction
+                turn_token = analyze_open_space(obs)
+                turn_direction = -1.0 if turn_token == "A" else 1.0
+
+                logger.info(
+                    f"Turn direction: {'left' if turn_token == 'A' else 'right'} "
+                    f"(token {turn_token})"
+                )
+
+                # Label buffered frames with turn command
+                for buffered_frame in frame_buffer:
+                    save_frame(
+                        frame_num=frame_num,
+                        image=buffered_frame["image"],
+                        steering=buffered_frame["steering"],
+                        throttle=buffered_frame["throttle"],
+                        info=buffered_frame["info"],
+                        output_dir=output_dir,
+                        track_name=track_name,
+                        steering_token=turn_token,
+                        is_obstacle_frame=True,
+                    )
+                    frame_num += 1
+                    obstacle_frame_count += 1
+
+                    if frame_num >= target_frames:
+                        break
+
+                frame_buffer.clear()
+
+                # Execute turn to recover
+                if frame_num < target_frames:
+                    logger.info(f"Executing {turn_steps}-step turn...")
+                    for step in range(turn_steps):
+                        turn_action = np.array(
+                            [turn_direction, turn_throttle], dtype=np.float32
+                        )
+                        obs, reward, done, info = env.step(turn_action)
+                        if done:
+                            break
+
+                    # Don't save turn frames (they're recovery, not training data)
+
+            else:
+                # Normal frame - save with computed steering token
+                save_frame(
+                    frame_num=frame_num,
+                    image=obs,
+                    steering=float(action[0]),
+                    throttle=float(action[1]),
+                    info=info,
+                    output_dir=output_dir,
+                    track_name=track_name,
+                    steering_token="D",  # Going straight
+                    is_obstacle_frame=False,
+                )
+                frame_num += 1
+                normal_frame_count += 1
+
+            # Log progress
+            if frame_num % 100 == 0:
+                logger.info(
+                    f"Collected {frame_num}/{target_frames} frames | "
+                    f"Normal: {normal_frame_count} | "
+                    f"Obstacle: {obstacle_frame_count} | "
+                    f"Collisions: {collision_count}"
+                )
+
+            # Rate limiting
+            elapsed = time.time() - start_time
+            if elapsed < frame_interval:
+                time.sleep(frame_interval - elapsed)
+
+    logger.info(
+        f"Collection complete. Normal: {normal_frame_count}, "
+        f"Obstacle: {obstacle_frame_count}, Collisions: {collision_count}"
+    )
 
     return frame_num
 
@@ -206,6 +366,8 @@ def main(cfg: DictConfig) -> None:
         # Collect data based on mode
         if cfg.collection.mode == "autopilot":
             num_frames = collect_autopilot(env, cfg, output_dir, track_name)
+        elif cfg.collection.mode == "obstacle_aware":
+            num_frames = collect_obstacle_aware(env, cfg, output_dir, track_name)
         elif cfg.collection.mode == "manual":
             logger.error("Manual mode not yet implemented. Use autopilot mode.")
             raise NotImplementedError("Manual mode requires pygame for keyboard input")

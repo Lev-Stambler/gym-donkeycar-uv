@@ -1,6 +1,19 @@
-"""Steering value to discrete token mapping utilities."""
+"""Steering value to discrete token mapping utilities for obstacle avoidance."""
 
-from typing import Dict, Tuple
+from typing import Any, Dict, Tuple
+
+# Action tokens for obstacle avoidance task
+# A/G = turn commands (executed as 80° rotation)
+# B-F = steering while moving forward
+ACTION_TOKENS: Dict[str, Dict[str, Any]] = {
+    "A": {"type": "turn", "degrees": -80, "description": "Turn left 80°"},
+    "B": {"type": "steer", "value": -0.7, "description": "Hard left steering"},
+    "C": {"type": "steer", "value": -0.3, "description": "Slight left steering"},
+    "D": {"type": "steer", "value": 0.0, "description": "Go straight"},
+    "E": {"type": "steer", "value": 0.3, "description": "Slight right steering"},
+    "F": {"type": "steer", "value": 0.7, "description": "Hard right steering"},
+    "G": {"type": "turn", "degrees": 80, "description": "Turn right 80°"},
+}
 
 # 7 steering buckets with token mapping (finer control)
 STEERING_BUCKETS: Dict[str, Tuple[float, float]] = {

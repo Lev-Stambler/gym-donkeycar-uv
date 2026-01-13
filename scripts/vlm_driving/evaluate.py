@@ -22,7 +22,7 @@ import hydra
 import torch
 from omegaconf import DictConfig, OmegaConf
 from peft import PeftModel
-from transformers import AutoProcessor, Qwen2VLForConditionalGeneration
+from transformers import AutoProcessor, Qwen3VLForConditionalGeneration
 
 from gym_donkeycar.core.sim_client import SimClient
 
@@ -55,7 +55,7 @@ def load_finetuned_model(cfg: DictConfig):
     torch_dtype = getattr(torch, cfg.torch_dtype)
 
     # Load base model
-    model = Qwen2VLForConditionalGeneration.from_pretrained(
+    model = Qwen3VLForConditionalGeneration.from_pretrained(
         cfg.model_id,
         device_map=cfg.device_map,
         torch_dtype=torch_dtype,

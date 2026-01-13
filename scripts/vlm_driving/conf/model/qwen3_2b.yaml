@@ -1,6 +1,6 @@
 # Qwen3-VL-2B model configuration
-model_id: "Qwen/Qwen2-VL-2B-Instruct"  # Update when Qwen3-VL is released
-processor_id: "Qwen/Qwen2-VL-2B-Instruct"
+model_id: "Qwen/Qwen3-VL-2B-Instruct"
+processor_id: "Qwen/Qwen3-VL-2B-Instruct"
 
 # Quantization configuration (QLoRA)
 quantization:

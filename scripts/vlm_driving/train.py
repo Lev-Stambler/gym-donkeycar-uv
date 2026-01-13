@@ -27,7 +27,7 @@ from PIL import Image
 from transformers import (
     AutoProcessor,
     BitsAndBytesConfig,
-    Qwen2VLForConditionalGeneration,
+    Qwen3VLForConditionalGeneration,
 )
 from trl import SFTConfig, SFTTrainer
 
@@ -61,7 +61,7 @@ def load_model_and_processor(cfg: DictConfig):
     torch_dtype = getattr(torch, cfg.torch_dtype)
 
     # Load model
-    model = Qwen2VLForConditionalGeneration.from_pretrained(
+    model = Qwen3VLForConditionalGeneration.from_pretrained(
         cfg.model_id,
         quantization_config=bnb_config,
         device_map=cfg.device_map,
