@@ -1,42 +1,41 @@
-# Training configuration
-training:
-  # Training hyperparameters
-  num_train_epochs: 3
-  per_device_train_batch_size: 4
-  per_device_eval_batch_size: 4
-  gradient_accumulation_steps: 8
+# @package training
+# Training hyperparameters
+num_train_epochs: 3
+per_device_train_batch_size: 4
+per_device_eval_batch_size: 4
+gradient_accumulation_steps: 8
 
-  # Learning rate
-  learning_rate: 2.0e-4
-  weight_decay: 0.01
-  warmup_ratio: 0.1
-  lr_scheduler_type: "cosine"
-  max_grad_norm: 1.0
+# Learning rate
+learning_rate: 2.0e-4
+weight_decay: 0.01
+warmup_ratio: 0.1
+lr_scheduler_type: "cosine"
+max_grad_norm: 1.0
 
-  # Memory optimization
-  fp16: true
-  bf16: false
-  gradient_checkpointing: true
-  optim: "paged_adamw_32bit"
+# Memory optimization
+fp16: true
+bf16: false
+gradient_checkpointing: true
+optim: "paged_adamw_32bit"
 
-  # Logging and saving
-  logging_steps: 10
-  save_steps: 500
-  eval_steps: 500
-  save_total_limit: 3
+# Logging and saving
+logging_steps: 10
+save_steps: 500
+eval_steps: 500
+save_total_limit: 3
 
-  # Important for VLMs
-  remove_unused_columns: false
-  dataloader_num_workers: 4
+# Important for VLMs
+remove_unused_columns: false
+dataloader_num_workers: 4
 
-  # Disable packing for VLMs
-  packing: false
+# Disable packing for VLMs
+packing: false
 
-  # Don't truncate image tokens
-  max_seq_length: null
+# Don't truncate image tokens
+max_seq_length: null
 
-  # Reporting
-  report_to: "wandb"
+# Reporting
+report_to: "wandb"
 
-  # DeepSpeed (optional, use ZeRO-2 for LoRA)
-  deepspeed: null
+# DeepSpeed (optional, use ZeRO-2 for LoRA)
+deepspeed: null
