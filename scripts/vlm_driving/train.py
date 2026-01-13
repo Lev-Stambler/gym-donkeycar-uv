@@ -179,7 +179,7 @@ def main(cfg: DictConfig) -> None:
     torch.manual_seed(cfg.seed)
 
     # Check for training data
-    train_file = Path(cfg.train_file)
+    train_file = Path(cfg.data.train_file)
     if not train_file.exists():
         logger.error(f"Training data not found: {train_file}")
         logger.error("Run create_dataset.py first to generate train.jsonl")
@@ -189,7 +189,7 @@ def main(cfg: DictConfig) -> None:
     logger.info(f"Loading dataset from {train_file}")
     data_files = {"train": str(train_file)}
 
-    val_file = Path(cfg.val_file)
+    val_file = Path(cfg.data.val_file)
     if val_file.exists():
         data_files["validation"] = str(val_file)
         logger.info(f"Found validation data: {val_file}")
@@ -200,10 +200,10 @@ def main(cfg: DictConfig) -> None:
         logger.info(f"Val samples: {len(dataset['validation'])}")
 
     # Load model and processor
-    model, processor = load_model_and_processor(cfg)
+    model, processor = load_model_and_processor(cfg.model)
 
     # Apply LoRA
-    model, lora_config = apply_lora(model, cfg)
+    model, lora_config = apply_lora(model, cfg.model)
 
     # Create output directory
     output_dir = Path(cfg.output_dir)
