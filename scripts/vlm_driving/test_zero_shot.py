@@ -135,7 +135,9 @@ def test_in_simulator():
         "host": "127.0.0.1",
         "port": 9091,
         "body_style": "donkey",
+        "body_rgb": (128, 128, 128),
         "car_name": "zero_shot_test",
+        "font_size": 100,
         "max_cte": 20.0,
         "cam_resolution": (120, 160, 3),
     }

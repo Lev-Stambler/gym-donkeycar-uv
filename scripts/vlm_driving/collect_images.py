@@ -44,7 +44,9 @@ def collect_images(
         "host": host,
         "port": port,
         "body_style": "donkey",
+        "body_rgb": (128, 128, 128),
         "car_name": "image_collector",
+        "font_size": 100,
         "max_cte": 20.0,
         "cam_resolution": (120, 160, 3),
     }
