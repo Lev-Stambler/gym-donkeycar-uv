@@ -38,8 +38,8 @@ and "help wanted" is open to whoever wants to implement it.
 Write Documentation
 ~~~~~~~~~~~~~~~~~~~
 
-OpenAI Gym Environments for Donkey Carcould always use more documentation, whether as part of the
-official OpenAI Gym Environments for Donkey Cardocs, in docstrings, or even on the web in blog posts,
+OpenAI Gym Environments for Donkey Car could always use more documentation, whether as part of the
+official OpenAI Gym Environments for Donkey Car docs, in docstrings, or even on the web in blog posts,
 articles, and such.
 
 Submit Feedback
@@ -64,11 +64,10 @@ Ready to contribute? Here's how to set up `gym_donkeycar` for local development.
 
     $ git clone git@github.com:your_name_here/gym-donkeycar.git
 
-3. Install your local copy into a virtualenv. Assuming you have virtualenvwrapper installed, this is how you set up your fork for local development::
+3. Install your local copy using uv. This will create a virtual environment and install all dependencies::
 
-    $ mkvirtualenv gym_donkeycar
-    $ cd gym_donkeycar/
-    $ python setup.py develop
+    $ cd gym-donkeycar/
+    $ uv sync --extra tests --extra docs
 
 4. Create a branch for local development::
 
@@ -76,14 +75,12 @@ Ready to contribute? Here's how to set up `gym_donkeycar` for local development.
 
    Now you can make your changes locally.
 
-5. When you're done making changes, check that your changes pass flake8 and the
-   tests, including testing other Python versions with tox::
+5. When you're done making changes, check that your changes pass the linters and tests::
 
-    $ flake8 gym_donkeycar tests
-    $ python setup.py test or py.test
-    $ tox
-
-   To get flake8 and tox, just pip install them into your virtualenv.
+    $ uv run make check-codestyle
+    $ uv run make lint
+    $ uv run make type
+    $ uv run pytest
 
 6. Commit your changes and push your branch to GitHub::
 
@@ -101,17 +98,16 @@ Before you submit a pull request, check that it meets these guidelines:
 1. The pull request should include tests.
 2. If the pull request adds functionality, the docs should be updated. Put
    your new functionality into a function with a docstring, and add the
-   feature to the list in README.rst.
-3. The pull request should work for Python 3.6, 3.7, and for PyPy. Check
-   https://travis-ci.org/leigh-johnson/gym_donkeycar/pull_requests
-   and make sure that the tests pass for all supported Python versions.
+   feature to the list in README.md.
+3. The pull request should work for Python 3.9, 3.10, 3.11, and 3.12. Check
+   the GitHub Actions CI and make sure that the tests pass for all supported Python versions.
 
 Tips
 ----
 
 To run a subset of tests::
 
-$ py.test tests.test_gym_donkeycar
+$ uv run pytest tests/test_gym_donkeycar.py
 
 
 Deploying
@@ -125,8 +121,4 @@ $ bumpversion patch # possible: major / minor / patch
 $ git push
 $ git push --tags
 
-Travis will then deploy to PyPI if tests pass.
-
-WARNING: Ensure tests have passed on `branch` before cutting a release with `bumpversion && git push --tags`. 
-
-If the deploy build flakes, you will need run `bumpversion` and `git push --tags` again. 
+GitHub Actions will then deploy to PyPI if tests pass.

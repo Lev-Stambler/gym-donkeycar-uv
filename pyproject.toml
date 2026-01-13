@@ -1,8 +1,71 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "gym_donkeycar"
+dynamic = ["version"]
+description = "OpenAI Gym Environments for Donkey Car"
+readme = "README.md"
+license = "MIT"
+requires-python = ">=3.9"
+authors = [
+    { name = "Tawn Kramer", email = "tawnkramer@gmail.com" },
+]
+keywords = ["donkeycar", "environment", "agent", "rl", "openaigym", "openai-gym", "gym"]
+classifiers = [
+    "Development Status :: 2 - Pre-Alpha",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Natural Language :: English",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+]
+dependencies = [
+    "gym==0.22",
+    "numpy",
+    "pillow",
+    "setuptools",  # provides distutils for gym on Python 3.12+
+]
+
+[project.optional-dependencies]
+tests = [
+    "pytest",
+    "pytest-mock",
+    "pytest-cov",
+    "pytest-env",
+    "pytest-xdist",
+    "pytype",
+    "ruff",
+    "isort>=5.0",
+    "black",
+]
+docs = [
+    "sphinx",
+    "sphinx-autobuild",
+    "sphinx-rtd-theme",
+    "sphinxcontrib-spelling",
+    "sphinx-autodoc-typehints",
+]
+
+[project.urls]
+Homepage = "https://github.com/tawnkramer/gym-donkeycar"
+Documentation = "https://gym-donkeycar.readthedocs.io/en/latest/"
+Repository = "https://github.com/tawnkramer/gym-donkeycar"
+
+[tool.hatch.version]
+path = "gym_donkeycar/version.txt"
+pattern = "(?P<version>.+)"
+
+[tool.hatch.build.targets.wheel]
+packages = ["gym_donkeycar"]
+
 [tool.black]
 line-length = 127
 
 [tool.ruff]
-# The GitHub editor is 127 chars wide
 line-length = 127
 
 [tool.ruff.mccabe]
@@ -15,3 +78,6 @@ inputs = ["gym_donkeycar"]
 profile = "black"
 src_paths = ["gym_donkeycar"]
 line_length = 127
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

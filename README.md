@@ -11,10 +11,26 @@ Donkey Car OpenAI Gym
 
 Download simulator binaries: https://github.com/tawnkramer/gym-donkeycar/releases
 
-Install master version of gym donkey car:
+Install using uv (recommended):
+
+```shell
+uv add git+https://github.com/tawnkramer/gym-donkeycar
+```
+
+Or with pip:
 
 ```shell
 pip install git+https://github.com/tawnkramer/gym-donkeycar
+```
+
+### Development Setup
+
+Clone the repository and install with uv:
+
+```shell
+git clone https://github.com/tawnkramer/gym-donkeycar
+cd gym-donkeycar
+uv sync --extra tests --extra docs
 ```
 
 ## Example Usage
@@ -135,25 +151,25 @@ We are using [black codestyle](https://github.com/psf/black) (max line length of
 Type checking with `pytype`:
 
 ```
-make type
+uv run make type
 ```
 
 Codestyle check with `black`, `isort` and `ruff`:
 
 ```
-make check-codestyle
-make lint
+uv run make check-codestyle
+uv run make lint
 ```
 
 To run `pytype`, `format` and `lint` in one command:
 ```
-make commit-checks
+uv run make commit-checks
 ```
 
 Build the documentation:
 
 ```
-make docs
+uv run make docs
 ```
 
 

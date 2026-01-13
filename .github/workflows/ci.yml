@@ -16,30 +16,31 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: ["3.7", "3.8", "3.9", "3.10"]
+        python-version: ["3.9", "3.10", "3.11", "3.12"]
 
     steps:
-    - uses: actions/checkout@v2
-    - name: Set up Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v2
+    - uses: actions/checkout@v4
+    - name: Install uv
+      uses: astral-sh/setup-uv@v4
       with:
-        python-version: ${{ matrix.python-version }}
+        version: "latest"
+    - name: Set up Python ${{ matrix.python-version }}
+      run: uv python install ${{ matrix.python-version }}
     - name: Install dependencies
       run: |
-        python -m pip install --upgrade pip
-        pip install .[tests,docs]
+        uv sync --extra tests --extra docs
     # - name: Build the doc
     #   run: |
     #     make doc
     - name: Type check
       run: |
-        make type
+        uv run make type
     - name: Check codestyle
       run: |
-        make check-codestyle
+        uv run make check-codestyle
     - name: Lint with ruff
       run: |
-        make lint
+        uv run make lint
     # - name: Test with pytest
     #   run: |
-    #     make pytest
+    #     uv run make pytest
