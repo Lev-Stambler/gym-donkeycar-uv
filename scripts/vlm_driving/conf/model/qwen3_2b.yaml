@@ -1,6 +1,6 @@
 # Qwen3-VL-2B model configuration
 model_id: "Qwen/Qwen2-VL-2B-Instruct"  # Update when Qwen3-VL is released
-processor_id: ${model_id}
+processor_id: "Qwen/Qwen2-VL-2B-Instruct"
 
 # Quantization configuration (QLoRA)
 quantization:
@@ -9,8 +9,8 @@ quantization:
   bnb_4bit_compute_dtype: "float16"
   bnb_4bit_use_double_quant: true
 
-# Attention implementation
-attn_implementation: "flash_attention_2"
+# Attention implementation (use "sdpa" if flash_attn not installed)
+attn_implementation: "sdpa"
 
 # Model loading
 device_map: "auto"
