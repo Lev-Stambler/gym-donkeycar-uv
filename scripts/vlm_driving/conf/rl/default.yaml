@@ -1,0 +1,27 @@
+# RL training configuration
+# @package rl
+
+# Policy for data collection
+policy: "heuristic"  # random, heuristic, or vlm
+
+# Episode settings
+num_episodes: 50
+max_steps_per_episode: 500
+
+# Action execution
+base_throttle: 0.5
+turn_throttle: 0.2
+turn_steps: 100
+
+# Reward weighting for SFT
+# Higher = more weight on high-reward trajectories
+reward_temperature: 1.0  # Softmax temperature for reward weighting
+min_weight: 0.1  # Minimum sample weight
+max_weight: 10.0  # Maximum sample weight
+
+# Filtering
+min_episode_reward: -50  # Filter out very bad episodes
+min_episode_steps: 10  # Filter out very short episodes
+
+# Output
+output_dir: ${data_dir}/rl_trajectories

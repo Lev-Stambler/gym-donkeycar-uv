@@ -4,6 +4,7 @@ defaults:
   - model: qwen3_2b
   - training: default
   - inference: default
+  - rl: default
   - _self_
 
 # Global settings

@@ -23,6 +23,7 @@ from gym_donkeycar.core.fps import FPSTimer
 from gym_donkeycar.core.message import IMesgHandler
 
 from .steering_buckets import ACTION_TOKENS, token_to_steering
+from .prompts import get_inference_messages
 
 logger = logging.getLogger(__name__)
 
@@ -248,16 +249,8 @@ class VLMDonkeyHandler(IMesgHandler):
         Returns:
             Token string (A-G)
         """
-        # Prepare input in Qwen-VL chat format
-        messages = [
-            {
-                "role": "user",
-                "content": [
-                    {"type": "image", "image": image},
-                    {"type": "text", "text": self.prompt},
-                ],
-            }
-        ]
+        # Prepare input with system prompt describing actions
+        messages = get_inference_messages(image)
 
         # Apply chat template
         text = self.processor.apply_chat_template(
